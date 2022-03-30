@@ -1,0 +1,177 @@
+create table doctor
+(
+doctor_id int AUTO_INCREMENT,
+doctor_name varchar(20),
+doctor_phoneno bigint,
+constraint pk1 primary key(doctor_id));
+
+
+alter table doctor
+auto_increment=10;
+create table donor
+(
+donor_id int AUTO_INCREMENT,
+donor_name varchar(20),
+phone_no bigint,
+dob date,
+gender varchar(10),
+weight int,
+doctor_id int,
+constraint pk2 primary key(donor_id));
+
+alter table donor
+add pincode varchar(20);
+
+alter table donor
+add street varchar(20);
+
+alter table donor
+add city varchar(20);
+
+
+alter table donor
+add constraint fk1 foreign key(doctor_id) references doctor(doctor_id) on delete cascade;
+
+alter table donor
+auto_increment=10;
+
+create table blood_bank
+(
+blood_bank_id int AUTO_INCREMENT,
+blood_bank_name varchar(50),
+
+constraint pk3 primary key(blood_bank_id));
+
+alter table blood_bank_id;
+auto_increment=10;
+
+create table blood
+(
+blood_type varchar(20),
+donor_id int AUTO_INCREMENT,
+blood_bank_id int,
+constraint pk5 primary key(donor_id));
+
+alter table blood
+add constraint fk5 foreign key(donor_id) references donor(donor_id) on delete cascade;
+
+alter table blood
+add constraint fk7 foreign key(blood_bank_id) references blood_bank(blood_bank_id) on delete cascade;
+
+alter table blood
+auto_increment=10;
+
+create table patient 
+(
+patient_id int AUTO_Increment,
+patient_name varchar(20),
+p_phno bigint,
+h_add varchar(50),
+p_add varchar(50),
+constraint pk4 primary key(patient_id));
+
+create table blood_delivery
+(
+blood_bank_id int,
+patient_id int,
+constraint pk6 primary key(blood_bank_id,patient_id));
+
+alter table blood_delivery
+add constraint fk3 foreign key(blood_bank_id) references blood_bank(blood_bank_id) on delete cascade;
+
+alter table blood_delivery
+add constraint fk4 foreign key(patient_id) references patient(patient_id) on delete cascade;
+
+alter table doctor
+add constraint pk1 primary key(doctor_id);
+
+alter table donor
+add constraint pk2 primary key(donor_id);
+
+alter  table blood_bank
+add constraint pk3 primary key(blood_bank_id);
+
+alter table blood
+add constraint pk5 primary key(donor_id);
+
+alter table patient
+add constraint pk4 primary key(patient_id);
+
+alter table blood_delivery
+add constraint pk6 primary key(blood_bank_id,patient_id);
+
+create procedure main @no int,@value varchar(20)
+as
+begin
+SELECT blood_type,count(blood_type),blood_bank_id
+from blood b1
+where blood_type ='A+'
+and exists (select *
+            from blood_bank b2
+            where blood_bank_name='kims_hospital' and b1.blood_bank_id = b2.blood_bank_id)
+
+end
+
+insert into doctor values
+(100,'Dr.Akshay'),
+(101,'Dr.chandan'),
+(102,'Dr.Latha'),
+(103,'Dr.preetham'),
+(104,'Dr.Madhu');
+
+insert into blood_bank values
+(100,'Apollo_hospital'),
+(101,'kims_hospital'),
+(102,'shreyas_hospital'),
+(103,'Victoria_hospital'),
+(104,'Manipal_hospital');
+ 
+create table timelogs
+(
+id int auto_increment,
+donor_id int,
+c_time datetime,
+CONSTRAINT pk7 primary key(id));
+
+create table timelogs1
+(
+id1 int auto_increment,
+patient_id int,
+c_time1 datetime,
+constraint pk8 primary key(id1));
+
+
+stored procedure:-
+create procedure donor
+as
+select * from donor
+go;
+
+create procedure main @no int,@value varchar(20)
+as
+SELECT blood_type,count(blood_type),blood_bank_id
+from blood b1
+where blood_type =@no
+and exists (select *
+            from blood_bank b2
+            where blood_bank_name=@value and b1.blood_bank_id = b2.blood_bank_id)
+go;
+
+create trigger timetri
+after insert
+on
+donor
+for each row
+insert into timelogs values
+(NULL,new.donor_id,CURRENT_TIME);
+
+create trigger timetri1
+after insert
+on
+patient
+for each row
+insert into timelogs1 values
+(NULL,new.patient_id,CURRENT_TIME);
+
+
+
